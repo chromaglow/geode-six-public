@@ -1,6 +1,6 @@
 # Geode Six
 
-A local-first AI document archive and assistant for [YOUR_COMPANY_NAME].  
+A local-first AI document archive and assistant.  
 Runs on an NVIDIA Jetson Orin Nano 8GB with Ollama — no cloud dependencies required.
 
 ## Hardware Requirements
@@ -24,7 +24,7 @@ Runs on an NVIDIA Jetson Orin Nano 8GB with Ollama — no cloud dependencies req
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/[YOUR_ORG]/geode-six.git geode-six
+git clone https://github.com/chromaglow/geode-six-public.git geode-six
 cd geode-six
 
 # 2. Create environment file
@@ -90,7 +90,7 @@ sudo ./scripts/setup_usb_backup.sh /dev/sdX   # replace with your USB device
 
 ## Web UI
 
-Access the web UI at `http://localhost:8000` (local) or `https://[YOUR_DOMAIN].com` (remote via Cloudflare Tunnel).
+Access the web UI at `http://localhost:8000` (local) or `https://example.com` (remote via Cloudflare Tunnel).
 
 Four sections:
 - **Assistant** — Chat with AI models (Llama 3.1, BioMistral, Dolphin)
@@ -100,11 +100,11 @@ Four sections:
 
 ## Cloudflare Tunnel (Remote Access)
 
-Remote access is provided via Cloudflare Tunnel at `[YOUR_DOMAIN].com`.
+Remote access is provided via Cloudflare Tunnel at `example.com`.
 
 **Access levels:**
-- **[ADMIN_USER]** — full access to all endpoints
-- **[USER_1], [USER_2]** — web UI access only (no SSH, no admin endpoints)
+- **admin@example.com** — full access to all endpoints
+- **user1@example.com, user2@example.com** — web UI access only (no SSH, no admin endpoints)
 
 **Setup:**
 ```bash
@@ -115,9 +115,9 @@ sudo systemctl enable --now cloudflared.service
 ```
 
 Configure Cloudflare Access policies in the Cloudflare Zero Trust dashboard:
-1. Create an Access application for `[YOUR_DOMAIN].com`
+1. Create an Access application for `example.com`
 2. Add email OTP authentication
-3. Create policies: allow [ADMIN_USER]'s email full access, allow [USER_1] and [USER_2] web-only access
+3. Create policies: allow admin@example.com full access, allow user1@example.com and user2@example.com web-only access
 
 ## Troubleshooting
 

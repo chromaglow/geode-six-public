@@ -1,0 +1,18 @@
+[Unit]
+Description=Geode Six AI Router
+After=network.target ollama.service
+Wants=ollama.service
+
+[Service]
+Type=simple
+User=[YOUR_LINUX_USER]
+WorkingDirectory=/path/to/geode-six
+EnvironmentFile=/path/to/geode-six/.env
+ExecStart=/usr/bin/python3 -m uvicorn router.router:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/mnt/nvme/logs/router-service.log
+StandardError=append:/mnt/nvme/logs/router-service.log
+
+[Install]
+WantedBy=multi-user.target

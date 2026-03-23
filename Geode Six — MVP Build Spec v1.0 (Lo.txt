@@ -1,0 +1,426 @@
+Geode Six — MVP Build Spec v1.0 (Locked)
+For: Coding Agent (VSCode) | Geode / [YOUR_COMPANY_NAME] | March 2026
+
+What You Are Building
+A local-first AI document archive and assistant for a 3-person team. It runs on a NVIDIA Jetson Orin Nano 8GB ("Six") running Ubuntu 22.04 / JetPack 6.2. Ollama is already installed and the following models are already downloaded and working:
+
+llama3.1:8b-instruct-q4_0 — primary assistant
+dolphin-mistral — uncensored fallback
+cniongolo/biomistral — biomedical topics
+llava:7b-v1.6-mistral-q4_0 — vision/image queries
+
+Do not scaffold anything related to model installation. Ollama is running. Build around it.
+
+MVP Scope — Build Only These 5 Things
+Build in this exact order. Complete and test each milestone before starting the next.
+
+Modelfiles + Router
+Cloudflare Tunnel + Access
+GCA File Intake + USB Backup
+Semantic Search (Chroma)
+Web UI
+
+Voice loop and camera pipeline are out of scope for this build. Do not scaffold them.
+
+Acceptance Criteria — Read This First. This Is What "Done" Means.
+Milestone 1 — Router
+
+ POST /query accepts {prompt, user, sensitive, image_path} and returns a response from the correct model
+ Image attachment routes to LLaVA
+ Keywords biomass, pubmed, biotech, conversion route to BioMistral
+ sensitive=true flag routes to Dolphin-Mistral
+ Everything else routes to Llama 3.1
+ Every request logged: timestamp, model used, latency ms, tokens in/out
+ GET /health returns model availability and current memory usage within 2 seconds
+ If available system RAM is below 1GB, /query returns: "System is busy, please try again in a moment" instead of timing out
+ Router runs as systemd service, restarts on failure, starts on boot
+
+Milestone 2 — Remote Access
+
+ Charlie can reach the web UI from a different network via Cloudflare Tunnel URL
+ PN can reach the web UI from a different network
+ Neither Charlie nor PN can access SSH or any admin endpoint
+ Email one-time PIN login works on mobile browser
+ [ADMIN_USER] has full access to all endpoints
+ cloudflared runs as a systemd service with Restart=on-failure
+
+Milestone 3 — File Intake + Backup
+
+ POST /gca/upload accepts PDF, DOCX, TXT, MD, XLSX, JPG, PNG
+ AI assigns correct PROJECT code from: GEO, CMP, PR1, PR2, PR3, SYS, HR
+ AI assigns correct TYPE code from: AGD, SUM, OPS, BRF, TSR, VIS, REQ, IDX, FRM, RPT, BIO, AGR, CON
+ AI generates 3-4 word CamelCase description
+ Date resolution follows this priority order:
+
+1st: user provides date in note field
+2nd: document metadata (PDF properties, DOCX created date, EXIF for images)
+3rd: date found in original filename (parse formats: YYYYMMDD, MM-DD-YY, MonDD, etc.)
+4th: file system creation date (ctime)
+5th: today's date — flag in response as "Date estimated — please verify"
+
+
+ File saved as [PROJECT]_[TYPE]_[Description]_[YYYYMMDD]_v[X.Y].ext — no spaces, no exceptions
+ New uploads default to v0.1 unless user marks "ready to share" → v1.0
+ Before committing file: check if a file with same PROJECT + TYPE + Description already exists in that folder. If yes, warn user: "A [version] of this file already exists. This will be saved as [next version]. Continue?" User must confirm before file is written.
+ Upload response is a confirmation screen (not immediate commit) showing: assigned filename, project code, type code, description, date used, version, estimated flag if date was guessed. User can edit any field before confirming.
+ On confirmation screen, all assigned fields are editable: project, type, description, date, version, ready-to-share toggle
+ After user confirms, file is written to /mnt/nvme/gca/[PROJECT]/
+ After file is written, Chroma embedding triggered automatically
+ Unsupported file type returns plain-English error: "This file type is not supported. Accepted types: PDF, DOCX, TXT, MD, XLSX, JPG, PNG"
+ rsync copies /mnt/nvme/gca/ to /mnt/usb-backup/gca/ every 15 minutes via cron
+ USB not present → logs warning, does not crash, retries next cycle
+ USB automounts on plug-in via udev rule for drive labeled GEODE-BACKUP
+
+Milestone 4 — Semantic Search + Index Validation
+
+ All files in /mnt/nvme/gca/ are chunked, embedded, and indexed in Chroma on first run
+ New files are indexed automatically on upload confirmation
+ POST /gca/search accepts {query, synthesize} and returns ranked results
+ Each result includes: filename, path, project code, type code, relevance score, 200-char excerpt
+ Natural language query returns relevant results (test: "Project Beta biomass funding" returns PR2 docs)
+ synthesize=true passes top results to Llama 3.1 and returns a plain-English summary above the results list
+ Chroma data persists at /mnt/nvme/chroma/ across reboots
+ Weekly cron job runs scripts/validate_index.py — checks every Chroma entry against actual files on disk, removes entries where the file no longer exists, logs a report to /mnt/nvme/logs/index_validation.log
+
+Milestone 5 — Web UI
+
+ Single-page app with four sections: Assistant, Upload, Browse, Search
+ Works on mobile Safari and Chrome (test at 390px width)
+ Dark mode, clean minimal style, large tap targets
+
+Assistant section:
+
+ Text input, send button, model selector dropdown (Llama / BioMistral / Dolphin)
+ Response displays below input, streams if possible
+
+Upload section:
+
+ Drag-and-drop or tap-to-upload
+ Optional note field (user can hint project, topic, or date)
+ Version toggle: Draft (v0.1) / Ready to Share (v1.0)
+ After AI processes file: show confirmation screen with all assigned fields editable before committing
+ If date was estimated: show yellow warning "Date estimated — please verify" next to date field
+ If duplicate version detected: show warning banner before user confirms
+ After confirmation: show success message with final filename
+
+Browse section:
+
+ Lists all files in GCA, sorted by date descending (newest first) by default
+ Filter by project code (dropdown: All, GEO, CMP, PR1, PR2, PR3, SYS, HR)
+ Filter by type code (dropdown: All, AGD, SUM, OPS, etc.)
+ Sort options: date descending, date ascending, project A-Z
+ Each row shows: filename, project badge, type badge, date, version
+ Page loads under 3 seconds for up to 500 files
+
+Search section:
+
+ Natural language text input
+ Results list: filename, project badge, type badge, relevance score, 200-char excerpt
+ "Summarize results" toggle — calls synthesize=true, displays summary above results list
+ Empty state: "No results found. Try different search terms."
+ Full page loads under 5 seconds on LTE
+
+
+Technical Decisions — Final, Do Not Substitute
+DecisionChoiceReasonAPI frameworkFastAPI + UvicornLightweight, async, runs well on Jetson ARM64Vector DBChroma (Python library)No separate server, persists to NVMe folderEmbedding modelnomic-embed-text via OllamaLocal, no cloud, runs on JetsonWeb UIVanilla HTML + CSS + JSNo build step, no npm, runs anywhereUI styleDark mode, mobile-firstTeam preferenceBackuprsync via cronSimple, reliable, zero dependenciesAuthCloudflare Access email OTPNo passwords, free tierProcess managementsystemdAlready on Ubuntu, handles restarts and bootPython version3.10+JetPack 6.2 default
+Do not introduce React, Node, Docker, or any package that requires a build step.
+
+GCA File Naming Convention — Implement This Exactly
+Formula: [PROJECT]_[TYPE]_[Description]_[YYYYMMDD]_v[X.Y].ext
+Example: PR1_TSR_EconomicDev_20260313_v2.0.docx
+Project codes:
+
+GEO — Geode Solutions internal operations
+CMP — [YOUR_COMPANY_NAME] company-wide
+PR1 — Project Alpha project
+PR2 — Project Beta project
+PR3 — Project Gamma project
+SYS — Operations and Systems
+HR — HR / People
+
+Type codes:
+
+AGD — Agenda
+SUM — Summary / Meeting Notes
+OPS — Operations
+BRF — Brief
+TSR — Teaser / Pitch material
+VIS — Vision / Strategy
+REQ — Requirements / Specs
+IDX — Index / Master list
+FRM — Framework / Model
+RPT — Report / Research
+BIO — Bio / CV
+AGR — Agreement / Contract
+CON — Contacts
+
+Naming rules — enforce all:
+
+Underscores between the 5 pieces only. No spaces anywhere in filename
+Description is 3-4 words max, CamelCase (e.g., ProjectBetaBrief not project beta brief)
+Date is always YYYYMMDD
+Drafts start at v0.1. Files marked ready to share start at v1.0
+Never overwrite — if file with that name exists, increment version
+Keep original file extension
+
+AI naming prompt — send this to Llama 3.1 on every upload:
+You are a file naming assistant for [YOUR_COMPANY_NAME]. Given a document, assign:
+
+PROJECT code (one of: GEO, CMP, PR1, PR2, PR3, SYS, HR)
+TYPE code (one of: AGD, SUM, OPS, BRF, TSR, VIS, REQ, IDX, FRM, RPT, BIO, AGR, CON)
+Description: 3-4 words, CamelCase, no spaces, describes what this specific document is about
+
+If the user provides a hint note, use it to inform your decision.
+Respond ONLY with valid JSON: {"project": "XXX", "type": "XXX", "description": "XxxXxx"}
+No explanation. No markdown. JSON only.
+
+Folder Structure — Scaffold This Exactly
+geode-six/
+├── README.md
+├── CHANGELOG.md
+├── .env.example
+├── requirements.txt
+├── modelfiles/
+│   ├── Modelfile.llama31
+│   ├── Modelfile.dolphin
+│   ├── Modelfile.biomistral
+│   └── Modelfile.llava
+├── scripts/
+│   ├── build_modelfiles.sh
+│   ├── import_gca.py
+│   ├── validate_index.py
+│   └── setup_usb_backup.sh
+├── router/
+│   └── router.py
+├── gca/
+│   ├── intake.py
+│   ├── embed.py
+│   └── search.py
+├── ui/
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
+├── systemd/
+│   ├── geode-router.service
+│   ├── geode-gca.service
+│   └── cloudflared.service
+└── tests/
+    ├── test_router.py
+    ├── test_intake.py
+    └── test_search.py
+
+Storage Paths — Use These Exactly
+/mnt/nvme/gca/          — GCA document storage, by project subfolder
+/mnt/nvme/chroma/       — Chroma vector DB persistent storage
+/mnt/nvme/ollama/       — Ollama models (already exists, do not touch)
+/mnt/nvme/logs/         — All application and cron logs
+/mnt/usb-backup/gca/    — USB drive backup mirror
+Project subfolders under /mnt/nvme/gca/:
+/mnt/nvme/gca/GEO/
+/mnt/nvme/gca/CMP/
+/mnt/nvme/gca/PR1/
+/mnt/nvme/gca/PR2/
+/mnt/nvme/gca/PR3/
+/mnt/nvme/gca/SYS/
+/mnt/nvme/gca/HR/
+
+API Endpoints
+MethodEndpointPurposeGET/healthOllama status, model availability, RAM availablePOST/querySend prompt to router, get AI responsePOST/gca/uploadUpload file, get AI name suggestion for reviewPOST/gca/confirmUser confirms or edits fields, file is committedPOST/gca/searchNatural language search over GCAGET/gca/browseList files with filter and sort params
+POST /query request:
+{
+  "prompt": "string",
+  "user": "admin | user1 | user2",
+  "sensitive": false,
+  "image_path": "optional string"
+}
+POST /gca/upload request:
+Multipart form: file + optional note (string) + ready_to_share (boolean)
+POST /gca/upload response (confirmation payload — not yet committed):
+{
+  "temp_id": "uuid",
+  "original_filename": "string",
+  "suggested_filename": "string",
+  "project": "string",
+  "type": "string",
+  "description": "string",
+  "date": "YYYYMMDD",
+  "date_estimated": true | false,
+  "version": "string",
+  "duplicate_warning": "string or null"
+}
+POST /gca/confirm request (user approves or edits then submits):
+{
+  "temp_id": "uuid",
+  "project": "string",
+  "type": "string",
+  "description": "string",
+  "date": "YYYYMMDD",
+  "version": "string",
+  "ready_to_share": false
+}
+POST /gca/confirm response:
+{
+  "assigned_filename": "string",
+  "stored_path": "string",
+  "indexed": true
+}
+POST /gca/search request:
+{
+  "query": "string",
+  "synthesize": false
+}
+POST /gca/search response:
+{
+  "results": [
+    {
+      "filename": "string",
+      "path": "string",
+      "project": "string",
+      "type": "string",
+      "score": 0.91,
+      "excerpt": "string"
+    }
+  ],
+  "summary": "string or null"
+}
+GET /gca/browse params:
+project=PR2 (optional)
+type=SUM (optional)
+sort=date_desc | date_asc | project_asc (default: date_desc)
+
+Modelfiles — Write With This Geode Context
+System prompt to include in every Modelfile:
+Geode / [YOUR_COMPANY_NAME] is a keiretsu-model startup.
+Team: [USER_1] (COO), [USER_2] (networking/vision), [USER_3] (execution).
+Active projects: PR1 (Project Alpha), PR2 (Project Beta/Project Beta), PR3 (Project Gamma), PR4 (Project Delta), PR5 (Project Epsilon).
+This is a private internal assistant. Be direct, concise, and professional. Do not add unnecessary disclaimers.
+Per-model parameters:
+ModelTemperatureContext Windowllama3.1:8b0.78192dolphin-mistral0.84096biomistral0.34096llava0.54096
+
+Environment Variables — .env.example
+OLLAMA_HOST=http://localhost:11434
+GCA_ROOT=/mnt/nvme/gca
+CHROMA_PATH=/mnt/nvme/chroma
+LOG_PATH=/mnt/nvme/logs
+USB_BACKUP_PATH=/mnt/usb-backup/gca
+CLAUDE_API_KEY=optional_only_if_cloud_fallback_needed
+OPENAI_API_KEY=optional_only_if_cloud_fallback_needed
+RAM_THRESHOLD_MB=1024
+
+systemd Services
+geode-router.service
+
+Runs: uvicorn router.router:app --host 0.0.0.0 --port 8000
+WorkingDirectory: /path/to/geode-six
+Restart: on-failure
+WantedBy: multi-user.target
+
+geode-gca.service
+
+Background embedding watcher if needed
+Same restart and boot behavior
+
+cloudflared.service
+
+Runs: cloudflared tunnel run
+Restart: on-failure
+WantedBy: multi-user.target
+
+
+USB Backup
+Cron job (add to root crontab):
+*/15 * * * * /usr/bin/rsync -av --ignore-errors /mnt/nvme/gca/ /mnt/usb-backup/gca/ >> /mnt/nvme/logs/backup.log 2>&1
+Weekly index validation cron (add to root crontab):
+0 2 * * 0 /usr/bin/python3 /path/to/geode-six/scripts/validate_index.py >> /mnt/nvme/logs/index_validation.log 2>&1
+udev rule: create /etc/udev/rules.d/99-usb-backup.rules to automount any USB drive labeled GEODE-BACKUP to /mnt/usb-backup/. Include setup_usb_backup.sh that formats and labels the drive correctly.
+
+One-Time GCA Import Script
+Write scripts/import_gca.py that:
+
+Accepts source folder: python import_gca.py --source /path/to/google-drive-download
+Iterates all files recursively
+For each file: runs AI naming prompt, applies date resolution priority order, saves to correct /mnt/nvme/gca/[PROJECT]/ subfolder
+After all files saved: runs full Chroma embedding pass
+Prints summary: files processed, files skipped (unsupported type), errors
+
+
+Index Validation Script
+Write scripts/validate_index.py that:
+
+Pulls all document entries from Chroma
+For each entry checks that the file_path exists on disk
+If file does not exist: removes entry from Chroma index
+Logs: total checked, total removed, any errors
+Writes report to /mnt/nvme/logs/index_validation.log
+
+
+Tests — Write These
+tests/test_router.py
+
+test_health_endpoint_returns_200
+test_image_routes_to_llava
+test_biotech_keyword_routes_to_biomistral
+test_sensitive_flag_routes_to_dolphin
+test_default_routes_to_llama31
+test_every_request_produces_log_entry
+test_low_memory_returns_friendly_message
+
+tests/test_intake.py
+
+test_pdf_upload_returns_suggested_filename
+test_naming_formula_correct_format
+test_no_spaces_in_filename
+test_project_code_from_valid_list
+test_type_code_from_valid_list
+test_date_resolution_uses_metadata_before_today
+test_date_estimated_flag_set_when_no_date_found
+test_duplicate_warning_returned_when_version_exists
+test_confirm_endpoint_writes_file_to_correct_path
+test_unsupported_filetype_returns_plain_english_error
+
+tests/test_search.py
+
+test_search_returns_results_for_known_query
+test_results_include_required_fields
+test_synthesize_flag_returns_summary
+test_empty_query_returns_error
+test_browse_filters_by_project
+test_browse_sorts_by_date_descending
+
+
+README Must Include
+
+What this project is (2 sentences)
+Hardware requirements
+Prerequisites: Ollama installed, models downloaded, Python 3.10+
+Setup steps: clone, copy .env, pip install, build modelfiles, start services
+How to run the one-time Google Drive import script
+How to set up the USB backup drive (run setup_usb_backup.sh)
+API endpoint reference (one-liner per endpoint)
+How to access the web UI
+Troubleshooting: Ollama not responding, USB not mounting, Chroma index rebuild
+
+
+Rules For The Coding Agent
+
+Build milestone by milestone. Do not start the next milestone until the current one passes all its acceptance criteria.
+Run the relevant tests at the end of each milestone before moving on.
+No build steps. UI is vanilla HTML/CSS/JS. No npm, no webpack, no React.
+No Docker. Everything runs directly on the Jetson via systemd.
+No spaces in any filename produced by this system. Ever. Hard rule.
+All paths come from .env. Never hardcode /mnt/nvme/ anywhere in application code.
+If nomic-embed-text is unavailable via Ollama, fall back to sentence-transformers with all-MiniLM-L6-v2 and note it in CHANGELOG.
+The upload flow is two steps: AI suggests → user reviews and edits → user confirms → file is written. Never write a file before user confirmation.
+Stop and ask only if you hit a genuine blocker: missing hardware info, ambiguous naming rule, or a dependency that will not install on ARM64. Otherwise proceed with stated decisions.
+Log everything: every API request, every file intake, every backup run, every index validation. Logs go to /mnt/nvme/logs/.
+Update CHANGELOG.md at the end of each milestone with what was built and what was tested.
+
+
+How To Start
+# On the Jetson, logged in as [ADMIN_USER]:
+git init geode-six
+cd geode-six
+git remote add origin https://github.com/YOUR_ORG/geode-six.git
+
+# Attach CMP_File_Naming_Guide.pdf to your coding session before starting
+# Begin Milestone 1

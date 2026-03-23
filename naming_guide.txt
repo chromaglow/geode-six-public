@@ -1,0 +1,304 @@
+INTERNAL OPERATIONS GUIDE
+How We Name Our Files
+at Techland Ventures
+A plain-English guide for everyone — no tech background required.
+[YOUR_ARCHIVE_NAME] · March 2026
+SECTION 1
+Why Does File Naming Even Matter?
+You've probably done this before. You save a file, call it something like
+final.docx
+and move on. Aweek later you need it, can't find it, and end up with five files called
+final_FINAL_v2_USE_THIS_ONE.docx
+. We've all been there.
+😅
+The chaos tax is real.
+Every minute spent hunting for a file, figuring out which version is current, or wondering whatsomething is — that's time and mental energy burned unnecessarily. Multiply that across awhole team and it adds up fast.
+At Techland Ventures, we work across multiple active projects (Project Beta, Project Alpha, PR3, andmore), and we share files with partners, clients, and collaborators. A clear naming system means:
+Anyone
+can find any file in seconds, even if they've never seen the folder before.
+Everyone
+knows instantly what a file is without opening it.
+No one
+ever accidentally sends the wrong version to a partner again.
+Files
+sort themselves
+in a logical, predictable order automatically.
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 1/11
+SECTION 2
+The Formula — Five Simple Pieces
+Every file we create gets a name built from five pieces, always in the same order, always separatedby underscores (
+_
+). No spaces. No slashes. No random abbreviations you'll forget in two weeks.
+THE UNIVERSAL NAMING FORMULA
+[PROJECT] _ [TYPE] _ [Description] _ [YYYYMMDD] _v[X.Y]
+Example: PR1_TSR_EconomicDev_20260313_v2.0.docx
+💡
+Why underscores and not spaces?
+Spaces in file names cpr5e technical problems in many systems — they get replaced withweird characters like
+%20
+in web links, and can break automated tools. Underscores look cleanand work everywhere.
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 2/11
+SECTION 3
+Breaking Down a File Name
+Here's a real example, taken apart piece by piece:
+PR1_TSR_EconomicDev_20260313_v2.0.docx
+PR1
+Project Code.
+"PR1" = Project Alpha. This tells you immediately which projector team this file belongs to — before you even read anything else.
+TSR
+Document Type.
+"TSR" = Teaser. This tells you what kind of document it is— an agenda? A contract? A pitch deck? One glance and you know.
+EconomicDev
+Description.
+A short, plain-English label (3–4 words max) that distinguishesthis specific document from other teasers in the same project. CamelCase— no spaces needed.
+20260313
+Date.
+Always written Year-Month-Day (YYYYMMDD). This is the magicformat — files sorted by name will automatically appear in perfectchronological order.
+v2.0
+Version.
+"v2.0" means this is the second major version of this document.Simple, clear, and always at the end so it's easy to update.
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 3/11
+SECTION 4
+Project Codes — Who Does This File Belong To?
+The first thing in every file name tells you
+which project or team
+created it. We use short,memorable codes:
+Code
+What It Means
+Example
+GEO
+Geode Solutions — internal company operations
+GEO_AGD_...
+CMP
+[YOUR_COMPANY_NAME] — company-wide docs
+CMP_FRM_...
+PR1
+Project Alpha project
+PR1_TSR_...
+PR2
+Project Beta project
+PR2_REQ_...
+PR3
+Project Gamma project
+PR3_BRF_...
+SYS
+Operations & Systems
+SYS_IDX_...
+HR
+HR / People
+HR_BIO_...
+✅
+Why this is so useful
+Even if a file gets moved out of its folder by mistake, the project code tells you exactly where itbelongs. It's like a return address stamped directly on the document.
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 4/11
+SECTION 5
+Document Type Codes — What Kind of File Is This?
+The second piece tells you what
+type
+of document it is. You'll know what you're about to openbefore you open it:
+Code
+Type
+When to Use It
+AGD
+Agenda
+Meeting agendas, structured run-of-show docs
+SUM
+Summary / Notes
+Meeting notes, transcripts, flash reports
+OPS
+Operations
+Ops logs, operational plans
+BRF
+Brief
+Project briefs, context documents
+TSR
+Teaser
+Pitch teasers, deal materials for external sharing
+VIS
+Vision
+Vision docs, strategy documents, company narrative
+REQ
+Requirements
+Project requirements, specs
+IDX
+Index
+Master lists, indexes, directories
+FRM
+Framework
+Frameworks, models, structural documents
+RPT
+Report
+Research reports, external documents
+BIO
+Bio / CV
+Bios, CVs, people profiles
+AGR
+Agreement
+Contracts, founders agreements, legal docs
+CON
+Contacts
+Contact sheets, people directories
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 5/11
+SECTION 6
+The Date Format — Why We Write It "Backwards"
+This is the part that surprises people at first. We write dates as
+YYYYMMDD
+— year first, then month,then day. So March 13, 2026 becomes
+20260313
+.
+🤔
+Why not just write "Mar13" or "3/13/26" like normal?
+Becpr5e when you sort files by name, "normal" dates don't sort correctly. You'd get Marchbefore February. You'd get 2025 mixed in with 2026. It becomes chaos the moment you havemore than a handful of files.
+When you use YYYYMMDD, something magical happens. Sort any folder alphabetically, and everyfile instantly appears in
+perfect chronological order
+— no manual sorting, no confusion. It's one ofthe oldest tricks in file management and it works flawlessly.
+✨
+The self-sorting superpower
+Agendas sorted by date. Meeting summaries in order. Draft history from first to latest —automatically. That's the payoff for writing the year first.
+What date do you use?
+For meeting documents (agendas, summaries), use the date of the meeting.For other documents, use the date you first created or finalized it.
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 6/11
+SECTION 7
+Version Control — Never Lose Track of "Which One Is Current"
+Version control is just a way of keeping track of how a document has evolved over time. Instead ofrenaming files
+FINAL
+,
+FINAL2
+,
+ACTUAL_FINAL
+— we use a simple numbering system that everyoneunderstands instantly.
+The Two-Number System
+Every version looks like
+vX.Y
+— for example
+v1.3
+. Here's what X and Y mean:
+v0.1 · v0.2 · v0.3
+Draft.
+You're still working on it. Not ready to share externally.
+v1.0
+First published version.
+Ready — you'd be comfortable sending this to a partner or client.
+v1.1 · v1.2 · v1.3
+Minor updates.
+Small edits or corrections to a published doc. Structurehasn't changed.
+v2.0 · v3.0
+Major revision.
+The document has been substantially restructured or rebuilt.
+📌
+The golden rule: never delete old versions.
+Keep both
+v1.0
+and
+v2.0
+in the folder. Old versions are your history — they let you go back,compare, or recover something that got cut. Storage is cheap. Regret is expensive.
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 7/11
+SECTION 8
+Before & After — Real Files, Renamed
+Here's how the documents already in our drive transform under the new system:
+❌ Old Name
+✅ New Name
+Geode_Agenda_Mar13_v2.docx
+GEO_AGD_WeeklyMeeting_20260313_v2.0.docx
+Geode_Meeting_Summary_Mar10.docx
+GEO_SUM_WeeklyMeeting_20260310_v1.0.docx
+Teaser TechLand Project Alpha Draftv0.1.docx
+PR1_TSR_EconomicDev_20260313_v0.1.docx
+Teaser_TechLand_Project Alpha_v2.docx
+PR1_TSR_EconomicDev_20260313_v2.0.docx
+Project Beta_CH_Project_Requirements_v1.0.docx
+PR2_REQ_ProjectBeta_20260304_v1.0.docx
+CFO framework V1.docx
+CMP_FRM_CFO_20251004_v1.0.docx
+Vision_ver2.docx
+CMP_VIS_CompanyVision_20251004_v2.0.docx
+Charlie_2_6_2026.txt
+GEO_SUM_CharlieCall_20260206_v1.0.txt
+2_24_26 meeting summary.eml
+GEO_SUM_WeeklyMeeting_20260224_v1.0.eml
+SYS_Master_Index.docx
+SYS_IDX_MasterIndex_20260304_v1.0.docx
+👁️
+Notice what you can read without opening a single file.
+Project, document type, topic, date, and version — all at a glance. That's the whole point.
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 8/11
+SECTION 9
+Folder Names — Keep Them Short and Consistent
+Folders follow the same logic — short, clean, consistent capitalization. We standardize them tomatch the project codes where possible:
+Current Folder Name
+Standardized Name
+Why
+General Docs / Diagrams
+General
+Shorter, no slash, covers the intent
+HR / People
+HR
+Matches the HR project code
+meeting agendas
+Agendas
+Capitalized, consistent
+meeting summaries
+Summaries
+Capitalized, consistent
+Ops and Systems
+Ops
+Short, matches SYS project prefix logic
+Partner & Deal Materials
+Partners
+Short, clean
+PR3 bio Gen
+PR3
+Matches project code exactly
+project_alpha
+Project Alpha
+Properly capitalized
+Technical docs
+Technical
+Consistent style
+Project Beta
+Project Beta
+Already perfect — no change needed
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 9/11
+SECTION 10
+The Five Rules to Remember
+Rule 1 — Always use the formula.
+[PROJECT]_[TYPE]_[Description]_[YYYYMMDD]_v[X.Y]
+— every time, no exceptions.Even for "quick" files. Especially for those.
+Rule 2 — No spaces, ever.
+Use underscores between pieces. Use CamelCase inside a description (e.g.,
+EconomicDev
+not
+economic dev
+).
+Rule 3 — Dates go YYYYMMDD.
+Year, then month, then day. Always. This is what makes files sort themselves automatically.
+Rule 4 — Drafts start at v0.1, published docs start at v1.0.
+If you'd feel comfortable sending it to a client, it's at least v1.0. If it's still a work in progress, it'sv0.x.
+Rule 5 — Never overwrite. Always save a new version.
+Instead of saving over the old file, save a new copy with the updated version number. Keepevery version. You'll thank yourself later.
+⚡ Quick Reference Cheat Sheet
+THE FORMULA
+[PROJECT]_[TYPE]_[Description]_[YYYYMMDD]_v[X.Y].ext
+REAL EXAMPLE
+PR1_TSR_EconomicDev_20260313_v2.0.docx
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 10/11
+PROJECT CODES
+GEO · CMP · PR1 · PR2 · PR3 · SYS · HR
+DOCUMENT TYPE CODES
+AGD (Agenda) · SUM (Summary) · OPS (Operations) · BRF (Brief) · TSR (Teaser) · VIS (Vision) · REQ (Requirements) · IDX (Index) · FRM (Framework) · RPT (Report) · BIO (Bio/CV) · AGR(Agreement) · CON (Contacts)
+VERSION LOGIC
+v0.1–v0.9 = Draft in progress | v1.0 = First published version | v1.1+ = Minor edits | v2.0 = Major revision
+DATE FORMAT
+YYYYMMDD → March 13, 2026 = 20260313
+3/16/26, 10:59 AM CMP File Naming Guide
+https://www.google.com 11/11

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Geode Six — AI Document Archive and Assistant for Geode Solutions">
+    <title>Geode Six — Document Archive</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header id="app-header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">◆</span>
+                <h1>Geode Six</h1>
+            </div>
+            <div class="header-status" id="header-status">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav id="main-nav">
+        <button class="nav-btn active" data-section="assistant" id="nav-assistant">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Assistant</span>
+        </button>
+        <button class="nav-btn" data-section="upload" id="nav-upload">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>Upload</span>
+        </button>
+        <button class="nav-btn" data-section="browse" id="nav-browse">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Browse</span>
+        </button>
+        <button class="nav-btn" data-section="search" id="nav-search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Search</span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <!-- ===== ASSISTANT SECTION ===== -->
+        <section id="section-assistant" class="section active">
+            <div class="section-header">
+                <h2>AI Assistant</h2>
+                <div class="model-selector">
+                    <label for="model-select">Model:</label>
+                    <select id="model-select">
+                        <option value="geode-llama31">Llama 3.1</option>
+                        <option value="geode-biomistral">BioMistral</option>
+                        <option value="geode-dolphin">Dolphin (Uncensored)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chat-container" id="chat-container">
+                <div class="chat-welcome">
+                    <div class="welcome-icon">◆</div>
+                    <p>Ask anything. I'm your private assistant for Geode Solutions.</p>
+                </div>
+            </div>
+            <form class="chat-input-form" id="chat-form">
+                <div class="input-row">
+                    <textarea id="chat-input" placeholder="Type your message..." rows="1"></textarea>
+                    <button type="submit" id="chat-submit" class="btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ===== UPLOAD SECTION ===== -->
+        <section id="section-upload" class="section">
+            <div class="section-header">
+                <h2>Upload File</h2>
+            </div>
+
+            <!-- Upload Form -->
+            <div id="upload-form-container">
+                <div class="drop-zone" id="drop-zone">
+                    <div class="drop-zone-content">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="drop-icon">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p class="drop-text">Drag & drop a file here</p>
+                        <p class="drop-subtext">or tap to select</p>
+                        <p class="drop-formats">PDF, DOCX, TXT, MD, XLSX, JPG, PNG</p>
+                    </div>
+                    <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md,.xlsx,.jpg,.jpeg,.png" multiple hidden>
+                </div>
+
+                <div class="upload-options">
+                    <div class="form-group">
+                        <label for="upload-note">Note (optional)</label>
+                        <input type="text" id="upload-note" placeholder="Hint: project, topic, or date...">
+                    </div>
+                    <div class="form-group">
+                        <label class="toggle-label">
+                            <span>Ready to Share</span>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="ready-to-share">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span class="toggle-hint" id="version-hint">Draft (v0.1)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="upload-progress" class="upload-progress hidden">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <p class="progress-text">Processing file...</p>
+                </div>
+            </div>
+
+            <!-- SINGLE FILE: Confirmation Screen -->
+            <div id="single-confirm-container" class="hidden">
+                <div class="confirm-card">
+                    <h3>Review File Assignment</h3>
+                    <div class="confirm-original">
+                        <span class="label">Original:</span>
+                        <span id="confirm-original-name" class="original-name"></span>
+                    </div>
+
+                    <div id="confirm-date-warning" class="warning-banner hidden">
+                        ⚠️ Date estimated — please verify
+                    </div>
+                    <div id="confirm-duplicate-warning" class="warning-banner warning-duplicate hidden"></div>
+
+                    <div class="confirm-fields">
+                        <div class="form-group">
+                            <label for="confirm-project">Project / Operation</label>
+                            <select id="confirm-project">
+                                <!-- Populated dynamically from /gca/codes -->
+                            </select>
+                            <div class="inline-new-folder-wrapper">
+                                <a href="#" id="new-folder-toggle-link" class="new-folder-link">+ Add new folder</a>
+                                <div id="new-folder-inline" class="hidden">
+                                    <div class="inline-folder-fields">
+                                        <input type="text" id="new-folder-name" placeholder="Folder name" class="input-small">
+                                        <input type="text" id="new-folder-code" placeholder="CODE" maxlength="4" style="width: 80px; text-transform: uppercase;" class="input-small">
+                                        <select id="new-folder-tier" class="input-small">
+                                            <option value="Projects">Projects</option>
+                                            <option value="Operations">Operations</option>
+                                        </select>
+                                        <button type="button" id="new-folder-submit" class="btn-primary btn-small">Submit</button>
+                                        <a href="#" id="new-folder-cancel" class="new-folder-cancel-link">Cancel</a>
+                                    </div>
+                                    <div id="new-folder-msg" class="hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-type">Type</label>
+                            <select id="confirm-type">
+                                <option value="AGD">AGD — Agenda</option>
+                                <option value="SUM">SUM — Summary / Notes</option>
+                                <option value="OPS">OPS — Operations</option>
+                                <option value="BRF">BRF — Brief</option>
+                                <option value="TSR">TSR — Teaser / Pitch Material</option>
+                                <option value="VIS">VIS — Vision / Strategy</option>
+                                <option value="REQ">REQ — Requirements / Specs</option>
+                                <option value="IDX">IDX — Index / Master List</option>
+                                <option value="FRM">FRM — Framework / Model</option>
+                                <option value="RPT">RPT — Report / Research</option>
+                                <option value="BIO">BIO — Bio / CV</option>
+                                <option value="AGR">AGR — Agreement / Contract</option>
+                                <option value="CON">CON — Contacts</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-description">Description</label>
+                            <input type="text" id="confirm-description" placeholder="CamelCase, 3-4 words">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-date">Date (YYYYMMDD)</label>
+                            <input type="text" id="confirm-date" placeholder="20260313" maxlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-version">Version</label>
+                            <input type="text" id="confirm-version" placeholder="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <span>Ready to Share</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="confirm-ready-to-share">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="confirm-preview">
+                        <span class="label">Filename:</span>
+                        <span id="confirm-preview-name" class="preview-name"></span>
+                    </div>
+
+                    <div class="confirm-actions">
+                        <button id="confirm-cancel" class="btn-secondary">Cancel</button>
+                        <button id="confirm-submit" class="btn-primary">Confirm & Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BATCH FILES: Confirmation Screen -->
+            <div id="batch-confirm-container" class="hidden">
+                <div id="batch-progress-text" class="batch-progress-text hidden">Processing file 1 of 4...</div>
+                <div id="confirm-cards-wrapper"></div>
+                
+                <div id="batch-confirm-actions" class="confirm-actions-global hidden">
+                    <button id="batch-confirm-cancel" class="btn-secondary">Cancel All</button>
+                    <button id="batch-confirm-submit" class="btn-primary">Confirm All</button>
+                </div>
+            </div>
+
+            <!-- Template for Batch Confirmation Card -->
+            <template id="confirm-card-template">
+                <div class="confirm-card" data-index="">
+                    <h3>Review File Assignment</h3>
+                    <div class="confirm-original">
+                        <span class="label">Original:</span>
+                        <span class="original-name"></span>
+                    </div>
+
+                    <div class="warning-banner confirm-date-warning hidden">
+                        ⚠️ Date estimated — please verify
+                    </div>
+                    <div class="warning-banner warning-duplicate confirm-duplicate-warning hidden"></div>
+
+                    <div class="confirm-fields">
+                        <div class="form-group">
+                            <label>Project / Operation</label>
+                            <select class="confirm-project">
+                                <!-- Populated dynamically from /gca/codes -->
+                            </select>
+                            <div class="inline-new-folder-wrapper">
+                                <a href="#" class="new-folder-link new-folder-toggle-link">+ Add new folder</a>
+                                <div class="hidden new-folder-inline">
+                                    <div class="inline-folder-fields">
+                                        <input type="text" class="input-small new-folder-name" placeholder="Folder name">
+                                        <input type="text" class="input-small new-folder-code" placeholder="CODE" maxlength="4" style="width: 80px; text-transform: uppercase;">
+                                        <select class="input-small new-folder-tier">
+                                            <option value="Projects">Projects</option>
+                                            <option value="Operations">Operations</option>
+                                        </select>
+                                        <button type="button" class="btn-primary btn-small new-folder-submit">Submit</button>
+                                        <a href="#" class="new-folder-cancel-link new-folder-cancel">Cancel</a>
+                                    </div>
+                                    <div class="hidden new-folder-msg"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select class="confirm-type">
+                                <option value="AGD">AGD — Agenda</option>
+                                <option value="SUM">SUM — Summary / Notes</option>
+                                <option value="OPS">OPS — Operations</option>
+                                <option value="BRF">BRF — Brief</option>
+                                <option value="TSR">TSR — Teaser / Pitch Material</option>
+                                <option value="VIS">VIS — Vision / Strategy</option>
+                                <option value="REQ">REQ — Requirements / Specs</option>
+                                <option value="IDX">IDX — Index / Master List</option>
+                                <option value="FRM">FRM — Framework / Model</option>
+                                <option value="RPT">RPT — Report / Research</option>
+                                <option value="BIO">BIO — Bio / CV</option>
+                                <option value="AGR">AGR — Agreement / Contract</option>
+                                <option value="CON">CON — Contacts</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" class="confirm-description" placeholder="CamelCase, 3-4 words">
+                        </div>
+                        <div class="form-group">
+                            <label>Date (YYYYMMDD)</label>
+                            <input type="text" class="confirm-date" placeholder="20260313" maxlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label>Version</label>
+                            <input type="text" class="confirm-version" placeholder="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <span>Ready to Share</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" class="confirm-ready-to-share">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="confirm-preview">
+                        <span class="label">Filename:</span>
+                        <span class="preview-name confirm-preview-name"></span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Success Screen -->
+            <div id="upload-success" class="hidden">
+                <div class="success-card">
+                    <div class="success-icon">✓</div>
+                    <h3 id="success-title">Files Saved Successfully</h3>
+                    <div id="success-list" class="success-list"></div>
+                    <button id="upload-another" class="btn-primary">Upload More</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== BROWSE SECTION ===== -->
+        <section id="section-browse" class="section">
+            <div class="section-header">
+                <h2>Browse Files</h2>
+            </div>
+            <!-- Tier Toggle -->
+            <div class="pill-toggle" id="browse-tier-toggle">
+                <button type="button" class="pill active" data-value="All">All</button>
+                <button type="button" class="pill" data-value="Projects">Projects</button>
+                <button type="button" class="pill" data-value="Operations">Operations</button>
+            </div>
+            <div class="browse-filters">
+                <div class="filter-group">
+                    <select id="browse-project-filter">
+                        <!-- Populated dynamically -->
+                        <option value="">All Codes</option>
+                    </select>
+                    <select id="browse-type-filter">
+                        <option value="">All Types</option>
+                        <option value="AGD">AGD — Agenda</option>
+                        <option value="SUM">SUM — Summary / Notes</option>
+                        <option value="OPS">OPS — Operations</option>
+                        <option value="BRF">BRF — Brief</option>
+                        <option value="TSR">TSR — Teaser / Pitch Material</option>
+                        <option value="VIS">VIS — Vision / Strategy</option>
+                        <option value="REQ">REQ — Requirements / Specs</option>
+                        <option value="IDX">IDX — Index / Master List</option>
+                        <option value="FRM">FRM — Framework / Model</option>
+                        <option value="RPT">RPT — Report / Research</option>
+                        <option value="BIO">BIO — Bio / CV</option>
+                        <option value="AGR">AGR — Agreement / Contract</option>
+                        <option value="CON">CON — Contacts</option>
+                    </select>
+                    <select id="browse-sort">
+                        <option value="date_desc">Newest First</option>
+                        <option value="date_asc">Oldest First</option>
+                        <option value="project_asc">Project A-Z</option>
+                    </select>
+                </div>
+                <button id="browse-refresh" class="btn-icon" title="Refresh">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="file-list" id="browse-file-list">
+                <div class="empty-state">
+                    <p>Loading files...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SEARCH SECTION ===== -->
+        <section id="section-search" class="section">
+            <div class="section-header">
+                <h2>Search Documents</h2>
+            </div>
+            <!-- Search Scope Toggle -->
+            <div class="pill-toggle" id="search-scope-toggle">
+                <button type="button" class="pill active" data-value="All">All</button>
+                <button type="button" class="pill" data-value="Projects">Projects</button>
+                <button type="button" class="pill" data-value="Operations">Operations</button>
+            </div>
+            <form class="search-form" id="search-form">
+                <div class="search-input-row">
+                    <input type="text" id="search-input" placeholder="Search in natural language...">
+                    <button type="submit" id="search-submit" class="btn-primary">Search</button>
+                </div>
+                <label class="toggle-label search-toggle">
+                    <span>Summarize results</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="search-synthesize">
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+            </form>
+            <div id="search-summary" class="search-summary hidden"></div>
+            <div class="search-results" id="search-results">
+                <div class="empty-state">
+                    <p>Enter a query to search your documents.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

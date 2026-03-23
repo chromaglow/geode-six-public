@@ -1,0 +1,17 @@
+[Unit]
+Description=Geode Six GCA Background Service
+After=network.target geode-router.service
+
+[Service]
+Type=simple
+User=[YOUR_LINUX_USER]
+WorkingDirectory=/path/to/geode-six
+EnvironmentFile=/path/to/geode-six/.env
+ExecStart=/usr/bin/python3 -c "print('GCA service placeholder — embedding watcher')"
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/mnt/nvme/logs/gca-service.log
+StandardError=append:/mnt/nvme/logs/gca-service.log
+
+[Install]
+WantedBy=multi-user.target
